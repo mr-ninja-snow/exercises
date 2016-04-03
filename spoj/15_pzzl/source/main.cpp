@@ -29,8 +29,8 @@ public :
 					int num;
 
 					input >> num;
+
 					p.m_puzzle. push_back(num );
-					std::cout << currentSolutionType << ", ";
 
 					if ( num == 0) {
 
@@ -51,7 +51,9 @@ public :
 
 					currentSolutionType = ! currentSolutionType;
 				}
-			currentSolutionType = ! currentSolutionType;
+				if (p.m_m % 2 == 0) {
+					currentSolutionType = ! currentSolutionType;
+				}
 			}
 			startingEven = ! startingEven;
 		}
@@ -79,20 +81,21 @@ public :
 		EVEN
 	};
 
-	void debugPrint ()
+	std::string debugPrint()
 	{
+		std::stringstream sso;
+
 		int mSqr = m_m * m_m;
 		for ( unsigned z = 0; z < m_m; ++z ) {
 			for ( unsigned y = 0; y < m_m; ++y ) {
 				for ( unsigned x = 0; x < m_m; ++x ) {
-					std::cout << m_puzzle[mSqr * z + m_m * y + x];
+					sso << m_puzzle[mSqr * z + m_m * y + x] << " ";
 				}
-				std::cout << " | ";
 			}
-			std::cout << "\n";
 		}
-		std::cout << "\n";
-		std::cout << "\n";
+		sso << "\n\n";
+
+		return sso.str();
 	}
 
 	std::string canBeSolved()
@@ -101,7 +104,6 @@ public :
 			return std::string( "Puzzle can be solved.\n" );
 		}
 
-		debugPrint();
 		std::vector <int> permutationCycles;
 		for ( auto& nPair : m_puzzleMap) {
 			// std::cout << "nPair.first - " << nPair.first << "; nPair.second - " << nPair.second << "\n";
@@ -172,17 +174,17 @@ private :
 
 int main( int argc , char const *argv[]) {
 	std::fstream file_out( "ans.txt" , std::fstream::out);
-	std::fstream file( "slovable.txt" , std::fstream::in);
+	std::fstream file( "solvable_3.txt" , std::fstream::in);
 
-	std::string input( "1 2 2 1 3 5 6 0 4 7" );
-	std::istringstream iss( input);
+	std::string inputStr( "1 2 2 1 3 5 6 0 4 7" );
+	std::istringstream iss(inputStr);
 
 	//std::istream& input = std::cin;
-	std::istream& input = iss;
-	// std::istream& input = file;
+	//std::istream& input = iss;
+	std::istream& input = file;
 
-	std::ostream& output = std::cout;
-	std::ostream& output = iss;
+	//std::ostream& output = std::cout;
+	std::ostream& output = file_out;
 
 	int t;
 	input >> t;
@@ -195,7 +197,10 @@ int main( int argc , char const *argv[]) {
 
 		input >> fp;
 
-		std::cout << fp.canBeSolved () << "\n";
+		std::cout << fp.debugPrint() << "\n\n";
+
+		output << fp.debugPrint();
+		output << fp.canBeSolved () << "\n";
 	}
 
 	file.close();
