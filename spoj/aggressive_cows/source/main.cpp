@@ -6,23 +6,38 @@
 #include <utility>
 #include <algorithm>
 
-std::pair<int, int> binarySerchForPointsOfInterst(std::vector<int>::iterator lo, std::vector<int>::iterator mid, std::vector<int>::iterator hi, int pointOfIntrest)
+int decisionHelper(int a, int b, int pointOfIntrest)
+{
+	int res1 = pointOfIntrest - a;
+	int res2 = b - pointOfIntrest;
+	if(res1 == res2) {
+		return b; // vstepano: this is incorrect
+	} else {
+		if(res1 > res2) {
+			return b;
+		} else {
+			return a;
+		}
+	}
+}
+
+int binarySerchForPointsOfInterst(std::vector<int>::iterator lo, std::vector<int>::iterator mid, std::vector<int>::iterator hi, int pointOfIntrest)
 {
 	if(*lo == pointOfIntrest || *mid == pointOfIntrest || *hi == pointOfIntrest) {
-		return std::pair<int, int>(pointOfIntrest, -1);
+		return pointOfIntrest;
 	}
 
 	if(pointOfIntrest > *mid) {
 		// vstepano check for bug
 		if(std::distance(mid, hi) == 1) {
-			return std::pair<int, int>(*mid, *hi);
+			return decisionHelper(*mid, *hi, pointOfIntrest);
 		} else {
 			std::vector<int>::iterator newMid = mid + std::distance(mid, hi) / 2;
 			return binarySerchForPointsOfInterst(mid, newMid, hi, pointOfIntrest);
 		}
 	} else {
 		if(std::distance(lo, mid) == 1) {
-			return std::pair<int, int>(*lo, *mid);
+			return decisionHelper(*lo, *mid, pointOfIntrest);
 		} else {
 			std::vector<int>::iterator newMid = mid - std::distance(lo, mid) / 2;
 			return binarySerchForPointsOfInterst(lo, newMid, mid, pointOfIntrest);
@@ -102,9 +117,9 @@ int main(int argc, char const *argv[]) {
 
 		output << currentPosCandidate << "\n";
 
-		std::vector<std::pair<int, int>> stalCandidates;
+		std::vector<int> stalCandidates;
 		while(cowsToSort != 0) {
-			std::pair<int, int> stalCandidate = binarySerchForPointsOfInterst(lo, mid, hi, currentPosCandidate);
+			int stalCandidate = binarySerchForPointsOfInterst(lo, mid, hi, currentPosCandidate);
 			stalCandidates.push_back(stalCandidate);
 			cowsToSort--;
 			currentPosCandidate += spacingBetweenPointsOfIntrest;
