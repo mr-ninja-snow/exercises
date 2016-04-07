@@ -5,6 +5,8 @@
 #include <sstream>
 #include <utility>
 #include <algorithm>
+#include <queue>
+#include <functional>
 
 int decisionHelper(int a, int b, int pointOfIntrest)
 {
@@ -68,8 +70,8 @@ int main(int argc, char const *argv[]) {
 	std::fstream file_out( "out.txt" , std::fstream::out);
 	std::fstream file( "in.txt" , std::fstream::in);
 
-	//std::string inputStr( "1 5 3 1 2 8 4 9" );
-	std::string inputStr("1 10 5 1 2 8 4 9 12 13 15 18 19");
+	std::string inputStr( "1 5 3 1 2 8 4 9" );
+	//std::string inputStr("1 10 5 1 2 8 4 9 12 13 15 18 19");
 	std::istringstream iss(inputStr);
 
 	//std::istream& input = std::cin;
@@ -118,15 +120,33 @@ int main(int argc, char const *argv[]) {
 		output << currentPosCandidate << "\n";
 
 		std::vector<int> stalCandidates;
+		stalCandidates.push_back(stalPos.front());
+
 		while(cowsToSort != 0) {
 			int stalCandidate = binarySerchForPointsOfInterst(lo, mid, hi, currentPosCandidate);
 			stalCandidates.push_back(stalCandidate);
 			cowsToSort--;
 			currentPosCandidate += spacingBetweenPointsOfIntrest;
 		}
+		stalCandidates.push_back(stalPos.back());
+
+		int currentStallPos = stalCandidates[0];
+		std::priority_queue <int, std::vector<int >, std::greater< int>> stallPositionsDiffs;
+
+		for(unsigned i = 1; i < stalCandidates.size(); ++i) {
+			int ans = stalCandidates[1] - currentStallPos;
+
+			stallPositionsDiffs.push(ans);
+
+			currentStallPos = stalCandidates[1];
+		}
 
 		output << stalPos << "\n\n";
 		output << stalCandidates << "\n";
+		output << stallPositionsDiffs.size() << "\n";
+
+		int a = stallPositionsDiffs.top();
+		output << a << "\n";
 	}
 
 	file.close();
