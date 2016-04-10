@@ -67,10 +67,13 @@ std::ostream& operator<<(std::ostream& out, std::pair<T, T> p)
 
 int main(int argc, char const *argv[]) {
 
-	std::fstream file_out( "out.txt" , std::fstream::out);
-	std::fstream file( "in.txt" , std::fstream::in);
+	// std::fstream file_out( "out.txt" , std::fstream::out);
+	// std::fstream file( "in.txt" , std::fstream::in);
 
-	std::string inputStr( "1 5 3 1 2 8 4 9" );
+	// std::string inputStr( "1 5 4 1 2 8 4 9" );
+	std::string inputStr( "1 7 4 2	13	15	16	55	66	99" );
+	//std::string inputStr( "1 2 2 1 2" );
+	// std::string inputStr( "1 5 3 1 2 8 4 9" );
 	//std::string inputStr("1 10 5 1 2 8 4 9 12 13 15 18 19");
 	std::istringstream iss(inputStr);
 
@@ -100,57 +103,119 @@ int main(int argc, char const *argv[]) {
 
 			stalPos.push_back(posTmp);
 		}
+
 		std::sort(stalPos.begin(), stalPos.end());
 
-		int cowsToSort = numberOfCows - 2; // a cow in pos 1 and in last pos
-		int minDistance = stalPos.back() - stalPos.front();
-		int numberOfAreasOfIntrest = cowsToSort + 1;//int(minDistance / cowsToSort);
-		int spacingBetweenPointsOfIntrest = int(minDistance / numberOfAreasOfIntrest);
-
-		std::vector<int>::iterator lo = stalPos.begin();
-		std::vector<int>::iterator hi= stalPos.end() - 1;
-		std::vector<int>::iterator mid = stalPos.begin() + std::distance(lo, hi) / 2;
-
-		output << *lo << "\n";
-		output << *mid << "\n";
-		output << *hi << "\n";
-
-		int currentPosCandidate = stalPos.front() + spacingBetweenPointsOfIntrest;
-
-		output << currentPosCandidate << "\n";
-
-		std::vector<int> stalCandidates;
-		stalCandidates.push_back(stalPos.front());
-
-		while(cowsToSort != 0) {
-			int stalCandidate = binarySerchForPointsOfInterst(lo, mid, hi, currentPosCandidate);
-			stalCandidates.push_back(stalCandidate);
-			cowsToSort--;
-			currentPosCandidate += spacingBetweenPointsOfIntrest;
-		}
-		stalCandidates.push_back(stalPos.back());
-
-		int currentStallPos = stalCandidates[0];
 		std::priority_queue <int, std::vector<int >, std::greater< int>> stallPositionsDiffs;
-
-		for(unsigned i = 1; i < stalCandidates.size(); ++i) {
-			int ans = stalCandidates[1] - currentStallPos;
+		int currentStallPos = stalPos.front();
+		for(unsigned i = 1; i < stalPos.size() - 1; ++i) {
+			int ans = stalPos[i] - currentStallPos;
 
 			stallPositionsDiffs.push(ans);
 
-			currentStallPos = stalCandidates[1];
+			currentStallPos = stalPos[i];
 		}
 
-		output << stalPos << "\n\n";
-		output << stalCandidates << "\n";
-		output << stallPositionsDiffs.size() << "\n";
+		int lo = stallPositionsDiffs.top();
+		int hi = stalPos.back() - stalPos.front();
 
-		int a = stallPositionsDiffs.top();
-		output << a << "\n";
+		output << stalPos << "\n\n";
+		while (lo < hi) {
+			int mid = lo + (hi - lo) / 2;
+			output << lo << " - " << mid << " - " << hi << "\n\n";
+
+			int currentCows = 0;
+			int currentDistance = 0;
+			int currentPos = stalPos.front();
+			for (int i = 1; i < stalPos.size(); ++i)
+			{
+				int distance = stalPos[i] - currentPos;
+
+				output << "currentDistance : " << currentDistance << "\ncurrentCows - " << currentCows << "\n";
+				output << "stalPos[i] -  currentPos =  " << stalPos[i] <<  "-" << currentPos << " = " << distance << "\n";
+				if (currentDistance + distance >= mid)
+				{
+
+					//int numCows = distance / mid + 1;
+					int numCows = distance / mid;
+					output << "number of cows in dist - " << numCows << "\n";
+					currentCows += numCows ? numCows : 1;
+					//currentCows += numCows;
+
+					currentDistance = distance - numCows * mid;
+				}
+				else
+				{
+					currentDistance += distance;
+				}
+				currentPos = stalPos[i];
+
+				output << "\n\n";
+			}
+
+			if (currentCows <= (numberOfCows - 1))
+			{
+				hi = mid;
+			}
+			else
+			{
+				lo = mid + 1;
+			}
+		}
+
+
+		output << lo - 1 << "\n";
+
+		// int cowsToSort = numberOfCows - 2; // a cow in pos 1 and in last pos
+		// int minDistance = stalPos.back() - stalPos.front();
+		// int numberOfAreasOfIntrest = cowsToSort + 1;//int(minDistance / cowsToSort);
+		// int spacingBetweenPointsOfIntrest = int(minDistance / numberOfAreasOfIntrest);
+
+		// std::vector<int>::iterator lo = stalPos.begin();
+		// std::vector<int>::iterator hi= stalPos.end() - 1;
+		// std::vector<int>::iterator mid = stalPos.begin() + std::distance(lo, hi) / 2;
+
+		// // output << *lo << "\n";
+		// // output << *mid << "\n";
+		// // output << *hi << "\n";
+
+		// int currentPosCandidate = stalPos.front() + spacingBetweenPointsOfIntrest;
+
+
+
+		// std::vector<int> stalCandidates;
+		// stalCandidates.push_back(stalPos.front());
+
+		// while(cowsToSort != 0) {
+		// 	output << "currentPosCandidate - " << currentPosCandidate << "\n";
+		// 	int stalCandidate = binarySerchForPointsOfInterst(lo, mid, hi, currentPosCandidate);
+		// 	stalCandidates.push_back(stalCandidate);
+		// 	cowsToSort--;
+		// 	currentPosCandidate += spacingBetweenPointsOfIntrest;
+		// }
+		// stalCandidates.push_back(stalPos.back());
+
+		// int currentStallPos = stalCandidates[0];
+		// std::priority_queue <int, std::vector<int >, std::greater< int>> stallPositionsDiffs;
+
+		// for(unsigned i = 1; i < stalCandidates.size() - 1; ++i) {
+		// 	int ans = stalCandidates[i] - currentStallPos;
+
+		// 	stallPositionsDiffs.push(ans);
+
+		// 	currentStallPos = stalCandidates[i];
+		// }
+
+		// output << stalPos << "\n\n";
+		// output << stalCandidates << "\n";
+		//  output << stallPositionsDiffs.size() << "\n";
+
+		// int a = stallPositionsDiffs.top();
+		// output << a << "\n";
 	}
 
-	file.close();
-	file_out.close();
+	// file.close();
+	// file_out.close();
 
 	return 0;
 }
