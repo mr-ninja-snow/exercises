@@ -28,10 +28,12 @@ int main(int argc, char const *argv[]) {
 	//std::string inputStr("1 5 4 1 2 8 4 9");
 	//std::string inputStr("1 5 2 1 2 8 4 9");
 	//std::string inputStr("1 5 4 1 2 8 4 9");
-	//std::string inputStr("1 2 2 1 2");
+	//std::string inputStr("1 2 2 1 3");
+	//std::string inputStr("1 2 2 1 3");
 	//std::string inputStr("1 7 4 2 13 15 16 55 66 99");
 	//std::string inputStr("1 7 2 2 13 15 16 55 66 99");
-	std::string inputStr("1 7 3 2 13 15 16 55 66 99");
+	//std::string inputStr("1 7 2 2 13 15 16 55 66 99");
+	std::string inputStr("1 7 3 2 13 15 16 27 75 99");
 	std::istringstream iss(inputStr);
 
 	//std::istream& input = std::cin;
@@ -61,14 +63,14 @@ int main(int argc, char const *argv[]) {
 			stalPos.push_back(posTmp);
 		}
 
-		if (numberOfCows == 2) {
+		/*if (numberOfCows == 2) {
 			output << stalPos.back() - stalPos.front() << "\n";
 			continue;
-		}
+		}*/
 
 		std::sort(stalPos.begin(), stalPos.end());
 
-		int lo = 2;
+		int lo = 1;
 		int hi = stalPos.back() - stalPos.front();
 
 		output << stalPos << "\n\n";
@@ -85,14 +87,14 @@ int main(int argc, char const *argv[]) {
 
 				output << "currentDistance : " << currentDistance << "\ncurrentCows - " << currentCows << "\n";
 				output << "stalPos[i] -  currentPos =  " << stalPos[i] << "-" << currentPos << " = " << distance << "\n";
-				if (currentDistance + distance >= x)
+				if (currentDistance + distance <= x)
 				{
-					currentCows++;
-					currentDistance = distance;
+					currentDistance += distance;
 				}
 				else
 				{
-					currentDistance += distance;
+					currentCows++;
+					currentDistance = distance;
 				}
 				currentPos = stalPos[i];
 
@@ -110,7 +112,7 @@ int main(int argc, char const *argv[]) {
 				lo = x + 1;
 			}
 		}
-		output << lo - 1 << "\n";
+		output << lo << "\n";
 	}
 
 	// file.close();
