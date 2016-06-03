@@ -2,6 +2,7 @@
 #include <fstream>
 #include <sstream>
 #include <chrono>
+#include <algorithm>
 
 #include "bprinter\table_printer.h"
 
@@ -53,7 +54,15 @@ std::vector<int> getInputVector(std::istream& input)
 	return v;
 }
 
-int twoSumBruteforce(const std::vector<int>& vecInts)
+enum Algos
+{
+	TWO_SUM_BRUTEFORCE,
+	TWO_SUM_BINSEARCH,
+	NUMBER_OF_ALGORITHMS
+};
+
+
+int twoSumBruteforce(/*const*/ std::vector<int>& vecInts)
 {
 	int count = 0;
 
@@ -65,7 +74,67 @@ int twoSumBruteforce(const std::vector<int>& vecInts)
 		}
 	}
 
+	std::cout << "twoSumBruteforce found " << count << " pairs;\n";
+
 	return count;
+}
+
+int twoSumBinSearch(std::vector<int>& vecInts)
+{
+	int count = 0;
+
+	std::sort(vecInts.begin(), vecInts.end());
+	int lo = 0;
+	int hi = 0;
+	for(unsigned i = 0; i < vecInts.size(); ++i) {
+		if(vecInts[i] > 0) {
+			break;
+		}
+		lo = i + 1;
+		hi = vecInts.size() - 1;
+
+		int searchFor = vecInts[i] * (-1);
+		//std::cout << "searching for " << searchFor << "\n";
+		while(lo < hi) {
+
+			int mid = lo + (hi - lo)/2;
+
+			//std::cout << "lo " << lo << " : " << vecInts[lo] << "\n";
+			//std::cout << "mid " << mid << " : " << vecInts[mid] << "\n";
+			//std::cout << "hi " << hi << " : " << vecInts[hi] << "\n";
+
+			if(vecInts[mid] == searchFor) {
+				count++;
+				break;
+			}
+
+			if(vecInts[mid] > searchFor) {
+				hi = mid;
+			} else {
+				lo = mid + 1;
+			}
+		}
+	}
+
+	std::cout << "twoSumBinSearch found " << count << " pairs;\n";
+
+	return count;
+}
+
+double testAlgo(int (*algoFunc)(std::vector<int>&), std::vector<double>& prevTimes, int algoIndex, const std::vector<int>& v)
+{
+	Timer t;
+
+	std::vector<int> vTmp(v);
+	t.Reset();
+	int res = algoFunc(vTmp);
+
+	double time = t.Elapsed().count();
+	if(prevTimes[algoIndex] == 0) {
+		prevTimes[algoIndex] = time;
+	}
+
+	return time;
 }
 
 int main(int argc, char const *argv[]) {
@@ -74,8 +143,9 @@ int main(int argc, char const *argv[]) {
 	vInputFiles = { "1Kints.txt", "2Kints.txt", "4Kints.txt", "8Kints.txt", "16Kints.txt", "32Kints.txt" };
 	std::string pathToInputDir("../testing/");
 
-	std::ostream& output = std::cout;
-	// std::ostream& output = file_out;
+	std::fstream file_out( "algo_out.txt" , std::fstream::out);
+	//std::ostream& output = std::cout;
+	std::ostream& output = file_out;
 
 	output << std::setprecision(5);
 
@@ -83,13 +153,13 @@ int main(int argc, char const *argv[]) {
 	tp.AddColumn("Input", 15);
 	tp.AddColumn("Two Sum Brute-force Time (ms)", 30);
 	tp.AddColumn("TS BF Doubling Ratio", 30);
+	tp.AddColumn("Two Sum Bin Search Time (ms)", 30);
+	tp.AddColumn("TS BS Doubling Ratio", 30);
 
 	tp.PrintHeader();
 
-	milliseconds prevTime(1);
-	double pt = 0;
-
-	Timer t;
+	std::vector<double> prevTimes(int(NUMBER_OF_ALGORITHMS), 0.0);
+	int res = 0;
 	for(auto&& fileName : vInputFiles) {
 
 		std::string inputFile = fileName;
@@ -98,27 +168,22 @@ int main(int argc, char const *argv[]) {
 		std::istream& input = file;
 
 		std::vector<int> v = getInputVector(input);
-
-		//Timer t;
-		t.Reset();
-		int res =  twoSumBruteforce(v);
-		// milliseconds time = t.Elapsed();
-		double time = t.Elapsed().count();
-
-		if(pt == 0) {
-			pt = time;
-		}
-
-		tp << fileName << time << time / pt ;
-
-		//output << time << "\n";
-
-		pt = time;
-
 		file.close();
+
+		tp << fileName;
+
+		double time = testAlgo(twoSumBruteforce, prevTimes, Algos::TWO_SUM_BRUTEFORCE, v);
+		tp << time << time / prevTimes[Algos::TWO_SUM_BRUTEFORCE] ;
+		prevTimes[Algos::TWO_SUM_BRUTEFORCE] = time;
+
+		time = testAlgo(twoSumBinSearch, prevTimes, Algos::TWO_SUM_BINSEARCH, v);
+		tp << time << time / prevTimes[Algos::TWO_SUM_BINSEARCH] ;
+		prevTimes[Algos::TWO_SUM_BINSEARCH] = time;
 	}
 
 	tp.PrintFooter();
+
+	file_out.close();
 
 	return 0;
 }
