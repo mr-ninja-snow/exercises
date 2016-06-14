@@ -179,6 +179,7 @@ int twoSumBruteforce(/*const*/ std::vector<int>& vecInts)
 		for(unsigned j = i; j < vecInts.size(); ++j) {
 			if(vecInts[j] + vecInts[i] == 0) {
 				count++;
+				//std::cout << vecInts[i] << " + " << vecInts[j] << "; index " << i << " + " << j << "\n";
 			}
 		}
 	}
@@ -192,13 +193,17 @@ int twoSumLinear(/*const*/ std::vector<int>& vecInts)
 {
 	int count = 0;
 
-	std::set<int> s;
+	std::sort(vecInts.begin(), vecInts.end());
 
-	for(unsigned i = 0; i < vecInts.size(); ++i) {
-		if(s.find(-vecInts[i]) != s.end()) {
-			count++;
-		}
-		s.insert(vecInts[i]);
+	unsigned i = 0;
+	unsigned j = vecInts.size() - 1;
+	for(; i < j; ++i) {
+
+		if (vecInts[i] > 0) { break; }
+
+		while(-vecInts[i] < vecInts[j] && i < j) { j--; }
+
+		if(-vecInts[i] == vecInts[j]) { count++; }
 	}
 
 	std::cout << "twoSumLinear found " << count << " pairs;\n";
@@ -262,9 +267,10 @@ double testAlgo(int (*algoFunc)(std::vector<int>&), std::vector<double>& prevTim
 int main(int argc, char const *argv[]) {
 
 	std::vector<std::string> vInputFiles;
-	// vInputFiles = { "1Kints.txt", "2Kints.txt", "4Kints.txt", "8Kints.txt", "16Kints.txt", "32Kints.txt" };
+	//vInputFiles = { "1Kints.txt", "2Kints.txt", "4Kints.txt", "8Kints.txt", "16Kints.txt", "32Kints.txt" };
 	// vInputFiles = { "1Kints.txt", "2Kints.txt", "4Kints.txt", "8Kints.txt" };
-	vInputFiles = { "1Kints.txt", "2Kints.txt", "4Kints.txt", "8Kints.txt" };
+	//vInputFiles = { "1Kints.txt", "2Kints.txt", "4Kints.txt", "8Kints.txt" };
+	vInputFiles = { "1Kints.txt", "2Kints.txt", "4Kints.txt", "8Kints.txt", "16Kints.txt" };
 	// vInputFiles = { "1Kints.txt" };
 	std::string pathToInputDir("../testing/");
 
