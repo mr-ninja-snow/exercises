@@ -62,6 +62,7 @@ enum Algos
 	TWO_SUM_LINEAR,
 	THREE_SUM_BRUTEFORCE,
 	THREE_SUM_BINSEARCH,
+	THREE_SUM_LINEAR,
 	FOUR_SUM_BRUTEFORCE,
 	NUMBER_OF_ALGORITHMS
 };
@@ -114,19 +115,12 @@ int threeSumBinSearch(std::vector<int>& vecInts)
 {
 	int count = 0;
 
-	//std::cout << "\n\n\n\nthreeSumBinSearch\n";
-
 	std::sort(vecInts.begin(), vecInts.end());
 	int lo = 0;
 	int hi = 0;
 	for(unsigned i = 0; i < vecInts.size(); ++i) {
-		//for (unsigned j = i + 1; j < vecInts.size(); ++j) {
 		for(unsigned j = i + 1; j < vecInts.size() - 1; ++j) {
 
-			/*if(vecInts[i] > 0) {  vstepano to be optimized
-				break;
-			}*/
-			//lo = j + 1;
 			lo = j + 1;
 			hi = vecInts.size() - 1;
 
@@ -138,21 +132,11 @@ int threeSumBinSearch(std::vector<int>& vecInts)
 				continue;
 			}
 
-			// if(searchFor < 0) {
-			// 	/* code */
-			// }
-			//std::cout << "searching for " << searchFor << "\n";
 			while(lo < hi) {
 
 				int mid = lo + (hi - lo)/2;
 
-					// std::cout << "lo " << lo << " : " << vecInts[lo] << "\n";
-					// std::cout << "mid " << mid << " : " << vecInts[mid] << "\n";
-					// std::cout << "hi " << hi << " : " << vecInts[hi] << "\n";
-
-
 				if(vecInts[mid] == searchFor) {
-					//std::cout << vecInts[i] << " + " << vecInts[j] << " + " << vecInts[mid] << "; index " << i << " + " << j << " + " << mid << "\n";
 					count++;
 					break;
 				}
@@ -167,6 +151,28 @@ int threeSumBinSearch(std::vector<int>& vecInts)
 	}
 
 	std::cout << "threeSumBinSearch found " << count << " threes;\n";
+
+	return count;
+}
+
+int threeSumLinear(std::vector<int>& vecInts)
+{
+	int count = 0;
+
+	std::sort(vecInts.begin(), vecInts.end());
+	int lo = 0;
+	int k = 0;
+	for(unsigned i = 0; i < vecInts.size(); ++i) {
+		k = vecInts.size() - 1;
+		for(unsigned j = i + 1; j < k; ++j) {
+
+			while(-(vecInts[i] + vecInts[j]) < vecInts[k] && j < k) { k--; }
+
+			if(-(vecInts[i] + vecInts[j]) == vecInts[k]) { count++; }
+		}
+	}
+
+	std::cout << "threeSumLinear found " << count << " threes;\n";
 
 	return count;
 }
@@ -268,9 +274,9 @@ int main(int argc, char const *argv[]) {
 
 	std::vector<std::string> vInputFiles;
 	//vInputFiles = { "1Kints.txt", "2Kints.txt", "4Kints.txt", "8Kints.txt", "16Kints.txt", "32Kints.txt" };
-	// vInputFiles = { "1Kints.txt", "2Kints.txt", "4Kints.txt", "8Kints.txt" };
+	vInputFiles = { "1Kints.txt", "2Kints.txt"};
 	//vInputFiles = { "1Kints.txt", "2Kints.txt", "4Kints.txt", "8Kints.txt" };
-	vInputFiles = { "1Kints.txt", "2Kints.txt", "4Kints.txt", "8Kints.txt", "16Kints.txt" };
+	//vInputFiles = { "1Kints.txt", "2Kints.txt", "4Kints.txt", "8Kints.txt", "16Kints.txt" };
 	// vInputFiles = { "1Kints.txt" };
 	std::string pathToInputDir("../testing/");
 
@@ -282,16 +288,18 @@ int main(int argc, char const *argv[]) {
 
 	bprinter::TablePrinter tp(&output);
 	tp.AddColumn("Input", 15);
-	tp.AddColumn("Two Sum Brute-force Time (ms)", 30);
-	tp.AddColumn("TS BF Doubling Ratio", 30);
-	tp.AddColumn("Two Sum Bin Search Time (ms)", 30);
-	tp.AddColumn("TS BS Doubling Ratio", 30);
-	tp.AddColumn("Two Sum Linear Time (ms)", 30);
-	tp.AddColumn("TS L Doubling Ratio", 30);
-	// tp.AddColumn("Three Sum Brute-force Time (ms)", 30);
-	// tp.AddColumn("3S BF Doubling Ratio", 30);
-	// tp.AddColumn("Three Sum Bin Search Time (ms)", 30);
-	// tp.AddColumn("3S BS Doubling Ratio", 30);
+	// tp.AddColumn("Two Sum Brute-force Time (ms)", 30);
+	// tp.AddColumn("TS BF Doubling Ratio", 30);
+	// tp.AddColumn("Two Sum Bin Search Time (ms)", 30);
+	// tp.AddColumn("TS BS Doubling Ratio", 30);
+	// tp.AddColumn("Two Sum Linear Time (ms)", 30);
+	// tp.AddColumn("TS L Doubling Ratio", 30);
+	tp.AddColumn("Three Sum Brute-force Time (ms)", 30);
+	tp.AddColumn("3S BF Doubling Ratio", 30);
+	tp.AddColumn("Three Sum Bin Search Time (ms)", 30);
+	tp.AddColumn("3S BS Doubling Ratio", 30);
+	tp.AddColumn("Three Sum Linear Time (ms)", 30);
+	tp.AddColumn("3S L Doubling Ratio", 30);
 	//tp.AddColumn("Four Sum Brute-force Time (ms)", 30);
 	//tp.AddColumn("4S BF Doubling Ratio", 30);
 
@@ -312,25 +320,29 @@ int main(int argc, char const *argv[]) {
 
 		tp << fileName;
 
-		time = testAlgo(twoSumBruteforce, prevTimes, Algos::TWO_SUM_BRUTEFORCE, v);
-		tp << time << time / prevTimes[Algos::TWO_SUM_BRUTEFORCE] ;
-		prevTimes[Algos::TWO_SUM_BRUTEFORCE] = time;
+		// time = testAlgo(twoSumBruteforce, prevTimes, Algos::TWO_SUM_BRUTEFORCE, v);
+		// tp << time << time / prevTimes[Algos::TWO_SUM_BRUTEFORCE] ;
+		// prevTimes[Algos::TWO_SUM_BRUTEFORCE] = time;
 
-		time = testAlgo(twoSumBinSearch, prevTimes, Algos::TWO_SUM_BINSEARCH, v);
-		tp << time << time / prevTimes[Algos::TWO_SUM_BINSEARCH] ;
-		prevTimes[Algos::TWO_SUM_BINSEARCH] = time;
+		// time = testAlgo(twoSumBinSearch, prevTimes, Algos::TWO_SUM_BINSEARCH, v);
+		// tp << time << time / prevTimes[Algos::TWO_SUM_BINSEARCH] ;
+		// prevTimes[Algos::TWO_SUM_BINSEARCH] = time;
 
-		time = testAlgo(twoSumLinear, prevTimes, Algos::TWO_SUM_LINEAR, v);
-		tp << time << time / prevTimes[Algos::TWO_SUM_LINEAR] ;
-		prevTimes[Algos::TWO_SUM_LINEAR] = time;
+		// time = testAlgo(twoSumLinear, prevTimes, Algos::TWO_SUM_LINEAR, v);
+		// tp << time << time / prevTimes[Algos::TWO_SUM_LINEAR] ;
+		// prevTimes[Algos::TWO_SUM_LINEAR] = time;
 
-		// time = testAlgo(threeSumBruteforce, prevTimes, Algos::THREE_SUM_BRUTEFORCE, v);
-		// tp << time << time / prevTimes[Algos::THREE_SUM_BRUTEFORCE] ;
-		// prevTimes[Algos::THREE_SUM_BRUTEFORCE] = time;
+		time = testAlgo(threeSumBruteforce, prevTimes, Algos::THREE_SUM_BRUTEFORCE, v);
+		tp << time << time / prevTimes[Algos::THREE_SUM_BRUTEFORCE] ;
+		prevTimes[Algos::THREE_SUM_BRUTEFORCE] = time;
 
-		// time = testAlgo(threeSumBinSearch, prevTimes, Algos::THREE_SUM_BINSEARCH, v);
-		// tp << time << time / prevTimes[Algos::THREE_SUM_BINSEARCH] ;
-		// prevTimes[Algos::THREE_SUM_BINSEARCH] = time;
+		time = testAlgo(threeSumBinSearch, prevTimes, Algos::THREE_SUM_BINSEARCH, v);
+		tp << time << time / prevTimes[Algos::THREE_SUM_BINSEARCH] ;
+		prevTimes[Algos::THREE_SUM_BINSEARCH] = time;
+
+		time = testAlgo(threeSumLinear, prevTimes, Algos::THREE_SUM_LINEAR, v);
+		tp << time << time / prevTimes[Algos::THREE_SUM_LINEAR] ;
+		prevTimes[Algos::THREE_SUM_LINEAR] = time;
 
 		//time = testAlgo(fourSumBruteforce, prevTimes, Algos::FOUR_SUM_BRUTEFORCE, v);
 		//tp << time << time / prevTimes[Algos::FOUR_SUM_BRUTEFORCE] ;
