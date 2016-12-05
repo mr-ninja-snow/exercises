@@ -1,0 +1,4 @@
+# Ignore everything in this directory
+.clang_complete
+# Except this file
+!.gitignore
