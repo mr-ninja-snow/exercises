@@ -53,7 +53,7 @@ void QuickFind::doUnion(unsigned int nodeA, unsigned int nodeB)
 
 bool QuickFind::connected(unsigned int nodeA, unsigned int nodeB)
 {
-	if(rangeCheck(nodeA, nodeB)) { return false; }
+	if(!rangeCheck(nodeA, nodeB)) { return false; }
 
 	if(m_idArray[nodeB] == m_idArray[nodeA]) {
 		return true;
