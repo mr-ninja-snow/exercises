@@ -54,7 +54,7 @@ public:
 
 	void debugVectorPrint(std::vector<long long int>& v, std::string msg) const 
 	{
-		// std::cout << "debug:" << msg << "\nindex|";
+		std::cout << "debug:" << msg << "\nindex|";
 		for(unsigned i = 0; i < v.size(); ++i) {
 			std::cout << std::setw(2) << i << " ";
 		}
@@ -75,7 +75,7 @@ public:
 		// divide_and_conquer(0, v1.size(),USE_V2_TO_MERGE );
 		// debugVectorPrint(getMainArray(resltingArray), "after sort");
 		vRes = getMainArray(resltingArray);
-		std::cout << "m_inversionCount: " << m_inversionCount << "\n\n";
+		// std::cout << "debug:" << "m_inversionCount: " << m_inversionCount << "\n\n";
 	}
 
 
@@ -210,7 +210,7 @@ private:
 				rightHalfIndex++;
 				
 				int invertions = mid - leftHalfIndex;
-				// std::cout << "invertions: " << invertions << "\n";
+				// std::cout << "debug:" << "invertions: " << invertions << "\n";
 				m_inversionCount += invertions;
 			} else{
 				// std::cout << "debug:" << "\t\tleftHalf item smaller\n";
@@ -228,7 +228,7 @@ private:
 	}
 };
 
-int main(int argc, char const *argv[]) {
+/*int main(int argc, char const *argv[]) {
 	// std::fstream file_out( "out.txt" , std::fstream::out);
 	std::fstream infile( "in.txt" , std::fstream::in);
 
@@ -292,6 +292,112 @@ int main(int argc, char const *argv[]) {
 		std::cout << "\n\nThe number of invertions match!\n";
 	} else {
 		std::cout << "\n\nERROR!!!\n\nThe number of invertions DO NOT match!\n";
+	}
+
+	return 0;
+}*/
+
+
+int main(int argc, char const *argv[]) {
+	// std::fstream file_out( "out.txt" , std::fstream::out);
+	// std::fstream file( "in.txt" , std::fstream::in);
+
+	// std::string inputStr("2\n\n3\n3\n1\n2\n\n5\n2\n3\n8\n6\n1\n");
+	// std::string inputStr("2\n\n3\n3\n1\n2\n\n5\n2\n3\n8\n6\n1\n");
+	// std::istringstream iss(inputStr);
+
+	std::istream& input = std::cin;
+	// std::istream& input = iss;
+	// std::istream& input = file;
+
+	std::ostream& output = std::cout;
+	// std::ostream& output = file_out;
+
+	int inputIndex = 0;
+	std::string inputNumStr;
+
+	// std::vector<int> ans;
+
+	std::vector<long long int> TC;
+	// std::map<int, int> arrayPosMap;
+	// std::vector<std::vector<int>> testcases;
+	// int testcasesIndex = 0;
+	InputState is = GET_ARRAY_SIZE;
+	int currentArraySize = 0;
+	int currentArrayIndex = 0;
+
+	int curNum = 0;
+	// int curAns = 0;
+
+	int numberOfTestCases = 0;
+	while (input >> inputNumStr)
+	{
+		// std::cout << "input: '" << inputNumStr<< "'\n";
+		if(inputIndex == 0) {
+			numberOfTestCases = std::stoi(inputNumStr);
+			inputIndex++;
+			continue;
+		}
+
+		switch(is)
+		{
+		case GET_ARRAY_SIZE:
+			currentArraySize = std::stoi(inputNumStr);
+			//testcases.emplace_back(currentArraySize);
+			TC.clear();
+			currentArrayIndex = 0;
+			is = GET_ARRAY_ELEMENT;
+			// std::cout << "\nsize of tc array  " << testcases.size() << "\n";
+			// arrayPosMap.clear();
+			break;
+		case GET_ARRAY_ELEMENT:
+			// testcases[testcasesIndex][currentArrayIndex] = std::stoi(inputNumStr);
+			curNum = std::stoi(inputNumStr);
+			TC.push_back(curNum);
+			// arrayPosMap.insert(std::pair<int, int>(curNum, currentArrayIndex));
+			// std::cout << "\nsize of tc  " << testcases[testcasesIndex].size() << "\n";
+			currentArrayIndex++;
+			if(currentArrayIndex == currentArraySize) {
+				// testcasesIndex++;
+				is = FIND_ANS;
+			}
+			else
+			{
+			break;
+			}
+		case FIND_ANS:
+		{
+			// std::cout << "\n\nhere is the map::\n";
+			// std::sort(TC.begin(), TC.end(), std::greater<int>());
+			MergeSort ms(std::move(TC));
+			auto start = std::chrono::high_resolution_clock::now();
+			ms.sort();
+			// currentArrayIndex = 0;
+			// curAns = 0;
+			// for(auto& el : TC) {
+			// 	//std::cout << tc.first << " in pos " << tc.second << "\n";
+			// 	for(unsigned i = currentArrayIndex; i < TC.size(); ++i) {
+			// 		if(el > TC[i]) {
+			// 			curAns++;
+			// 		}
+			// 	}
+
+			// 	currentArrayIndex++;
+
+			// }
+
+			// std::cout << "current ans  " << curAns << "\n";
+			is = GET_ARRAY_SIZE;
+			std::cout << ms.getInversionCount() << "\n";
+
+			numberOfTestCases--;
+			if(numberOfTestCases == 0) {
+				return 0;
+			}
+
+			break;
+		}
+		}
 	}
 
 	return 0;
