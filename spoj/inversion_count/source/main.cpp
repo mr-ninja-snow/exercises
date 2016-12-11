@@ -316,18 +316,12 @@ int main(int argc, char const *argv[]) {
 	int inputIndex = 0;
 	std::string inputNumStr;
 
-	// std::vector<int> ans;
-
 	std::vector<long long int> TC;
-	// std::map<int, int> arrayPosMap;
-	// std::vector<std::vector<int>> testcases;
-	// int testcasesIndex = 0;
 	InputState is = GET_ARRAY_SIZE;
 	int currentArraySize = 0;
 	int currentArrayIndex = 0;
 
 	int curNum = 0;
-	// int curAns = 0;
 
 	int numberOfTestCases = 0;
 	while (input >> inputNumStr)
@@ -367,26 +361,10 @@ int main(int argc, char const *argv[]) {
 			}
 		case FIND_ANS:
 		{
-			// std::cout << "\n\nhere is the map::\n";
-			// std::sort(TC.begin(), TC.end(), std::greater<int>());
 			MergeSort ms(std::move(TC));
 			auto start = std::chrono::high_resolution_clock::now();
 			ms.sort();
-			// currentArrayIndex = 0;
-			// curAns = 0;
-			// for(auto& el : TC) {
-			// 	//std::cout << tc.first << " in pos " << tc.second << "\n";
-			// 	for(unsigned i = currentArrayIndex; i < TC.size(); ++i) {
-			// 		if(el > TC[i]) {
-			// 			curAns++;
-			// 		}
-			// 	}
 
-			// 	currentArrayIndex++;
-
-			// }
-
-			// std::cout << "current ans  " << curAns << "\n";
 			is = GET_ARRAY_SIZE;
 			std::cout << ms.getInversionCount() << "\n";
 
