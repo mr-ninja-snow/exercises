@@ -9,29 +9,33 @@
 #include <vector>
 
 
-void updateBIT(std::vector<char>& BIT)
+void updateBIT(std::vector<unsigned long long int>& BIT)
 {
 
 }
 
-void initBIT(std::vector<char>& BIT)
+void initBIT(std::vector<unsigned long long int>& BIT)
 {
 	unsigned long long int currentNumber = 1;
+	unsigned long long int currentNumberStep = 2;
 
-	for(auto& i : BIT) {
-		if(currentNumber & 1) {
-			i = 1;
-		} else {
-			if(((currentNumber & (currentNumber-1)) == 0)) { // checking if number is a power of two
-				/* code */
-			}
+	while(currentNumber < BIT.size()){ 
+		for(unsigned i = currentNumber - 1; i < BIT.size(); ) {
+			BIT[i] = currentNumber;
+			i += currentNumberStep;
 		}
-
-		currentNumber++;
+		currentNumber *= 2;
+		currentNumberStep *= 2;
 	}
+
+	std::cout << "BIT content\n";
+	for(auto& i : BIT) {
+		std::cout << i << " ";
+	}
+	std::cout << "\n";
 }
 
-unsigned long long countNumberOfGreaterElements(std::vector<char>& BIT, unsigned long long int pos)
+unsigned long long countNumberOfGreaterElements(std::vector<unsigned long long int>& BIT, unsigned long long int pos)
 {
 	std::cout << "\n\n\n";
 
@@ -45,14 +49,16 @@ unsigned long long countNumberOfGreaterElements(std::vector<char>& BIT, unsigned
 
 		numberOfGreaterElements += BIT[currentPos];
 	}
+
+	return 0;
 }
 
 int main(int argc, char const *argv[]) {
 	// std::fstream file_out( "out.txt" , std::fstream::out);
 	std::fstream infile( "in.txt" , std::fstream::in);
 
-	std::vector<long long int> v;
-	std::vector<long long int> vSorted;
+	std::vector<unsigned long long int> v;
+	std::vector<unsigned long long int> vSorted;
 	int a;
 	while (infile >> a)
 	{
@@ -62,26 +68,27 @@ int main(int argc, char const *argv[]) {
 
 	std::sort(vSorted.begin(), vSorted.end(), std::greater<long long int>());
 
+	std::vector<unsigned long long int> BIT(vSorted.size());
+	initBIT(BIT);
 
-	std::vector<char> BIT(vSorted.size(), 1);
 
-	for(auto&& i : BIT) {
-		std::cout << " " << (int)i;
-	}
+	// for(auto&& i : BIT) {
+	// 	std::cout << " " << (int)i;
+	// }
 
-	std::cout << "\n";
+	// std::cout << "\n";
 
-	unsigned long long numberOfInvertions = 0;
-	for(auto rit = v.rbegin(); rit != v.rend(); rit++) {
-		auto elIt = std::find(vSorted.begin(), vSorted.end(), *rit);
-		std::cout << "\n\n*rit: " << *rit << "\n";
+	// unsigned long long numberOfInvertions = 0;
+	// for(auto rit = v.rbegin(); rit != v.rend(); rit++) {
+	// 	auto elIt = std::find(vSorted.begin(), vSorted.end(), *rit);
+	// 	std::cout << "\n\n*rit: " << *rit << "\n";
 
-		unsigned long long pos = std::distance(vSorted.begin(), elIt);
-		unsigned long long countNumberOfGreaterElements = countNumberOfGreaterElements(BIT, pos);
+	// 	unsigned long long pos = std::distance(vSorted.begin(), elIt);
+	// 	unsigned long long countNumberOfGreaterElements = countNumberOfGreaterElements(BIT, pos);
 
-		std::cout << "numberOfGreaterElements: " << numberOfGreaterElements << "\n";
-		numberOfInvertions += numberOfGreaterElements;
-	}
+	// 	std::cout << "numberOfGreaterElements: " << numberOfGreaterElements << "\n";
+	// 	numberOfInvertions += numberOfGreaterElements;
+	// }
 
-	std::cout << "numberOfInvertions: " << numberOfInvertions << "\n";
+	// std::cout << "numberOfInvertions: " << numberOfInvertions << "\n";
 }
