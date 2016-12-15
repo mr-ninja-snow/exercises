@@ -18,7 +18,7 @@ enum InputState
 	FIND_ANS
 };
 
-void brute_force(std::vector<long long int>& v, long long int& curAns)
+void brute_force(std::vector<unsigned long long int>& v, unsigned long long int& curAns)
 {
 	int currentArrayIndex = 0;
 	for(auto& el : v) {
@@ -34,13 +34,13 @@ void brute_force(std::vector<long long int>& v, long long int& curAns)
 
 class MergeSort {
 private:
-	std::vector<long long int> v1;
-	std::vector<long long int> v2;
-	std::vector<long long int>& vRes;
+	std::vector<unsigned long long int> v1;
+	std::vector<unsigned long long int> v2;
+	std::vector<unsigned long long int>& vRes;
 
 	int m_debugMergeCount;
 
-	long long int m_inversionCount;
+	unsigned long long int m_inversionCount;
 
 	enum AuxArray
 	{
@@ -50,9 +50,9 @@ private:
 
 	AuxArray m_currentAuxArray;
 public:
-	MergeSort(std::vector<long long int>&& v) : v1{v}, vRes{v1}, m_debugMergeCount{0}, m_inversionCount{0}, m_currentAuxArray{USE_V2_TO_MERGE} { v2.resize(v1.size()); }
+	MergeSort(std::vector<unsigned long long int>&& v) : v1{v}, vRes{v1}, m_debugMergeCount{0}, m_inversionCount{0}, m_currentAuxArray{USE_V2_TO_MERGE} { v2.resize(v1.size()); }
 
-	void debugVectorPrint(std::vector<long long int>& v, std::string msg) const 
+	void debugVectorPrint(std::vector<unsigned long long int>& v, std::string msg) const 
 	{
 		std::cout << "debug:" << msg << "\nindex|";
 		for(unsigned i = 0; i < v.size(); ++i) {
@@ -66,7 +66,7 @@ public:
 
 	}
 
-	long long int getInversionCount() const { return m_inversionCount; }
+	unsigned long long int getInversionCount() const { return m_inversionCount; }
 
 	void sort()
 	{
@@ -80,7 +80,7 @@ public:
 
 
 
-	const std::vector<long long int>& getSortedArray()
+	const std::vector<unsigned long long int>& getSortedArray()
 	{
 		return vRes;
 	}
@@ -99,8 +99,8 @@ private:
 		if(hi - lo < 1) {
 			// m_currentAuxArray = toggelAuxArray(m_currentAuxArray);
 			// std::cout << "debug:" << "return!\n";
-			std::vector<long long int>& mainArray = getMainArray(toUse);
-			std::vector<long long int>& auxArray = getAuxArray(toUse);
+			std::vector<unsigned long long int>& mainArray = getMainArray(toUse);
+			std::vector<unsigned long long int>& auxArray = getAuxArray(toUse);
 			auxArray[hi] = mainArray[hi];
 			return toUse;
 		}
@@ -116,8 +116,8 @@ private:
 		auto resltingAuxRight = divide_and_conquer(mid + 1, hi, toUse);
 
 		if(resltingAuxLeft != resltingAuxRight) {
-			std::vector<long long int>& mainRArrayy = getMainArray(resltingAuxRight);
-			std::vector<long long int>& mainLArrayy = getMainArray(resltingAuxLeft);
+			std::vector<unsigned long long int>& mainRArrayy = getMainArray(resltingAuxRight);
+			std::vector<unsigned long long int>& mainLArrayy = getMainArray(resltingAuxLeft);
 			for(unsigned i = mid + 1; i <= hi; ++i) {
 				mainLArrayy[i] = mainRArrayy[i];
 			}
@@ -139,8 +139,8 @@ private:
 		}
 	}
 
-	// std::vector<long long int>& getAuxArray()
-	std::vector<long long int>& getAuxArray(AuxArray toUse)
+	// std::vector<unsigned long long int>& getAuxArray()
+	std::vector<unsigned long long int>& getAuxArray(AuxArray toUse)
 	{
 		if(toUse == USE_V2_TO_MERGE) {
 		// if(m_currentAuxArray == USE_V2_TO_MERGE) {
@@ -150,8 +150,8 @@ private:
 		}
 	}
 
-	// std::vector<long long int>& getMainArray()
-	std::vector<long long int>& getMainArray(AuxArray toUse)
+	// std::vector<unsigned long long int>& getMainArray()
+	std::vector<unsigned long long int>& getMainArray(AuxArray toUse)
 	{
 		if(toUse == USE_V2_TO_MERGE) {
 		// if(m_currentAuxArray == USE_V2_TO_MERGE) {
@@ -168,8 +168,8 @@ private:
 	void merge(int lo, int mid, int hi, AuxArray toUse)
 	{
 		// std::cout << "debug:" << m_debugMergeCount++ << "# merging " << lo << ".."<< mid - 1 << " and " << mid << ".." << hi << "\n";
-		std::vector<long long int>& mainArrayy = getMainArray(toUse);
-		std::vector<long long int>& auxArray = getAuxArray(toUse);
+		std::vector<unsigned long long int>& mainArrayy = getMainArray(toUse);
+		std::vector<unsigned long long int>& auxArray = getAuxArray(toUse);
 		// debugVectorPrint(mainArrayy, "\n\nmain array before merge\n");
 
 		unsigned int leftHalfIndex = lo;
@@ -228,30 +228,121 @@ private:
 	}
 };
 
-/*int main(int argc, char const *argv[]) {
+void updateBIT(std::vector<unsigned long long int>& BIT, unsigned long long int index)
+{
+	// std::cout << "updateBIT begin\n";
+	if( index != 0) {
+		
+		while(index <= BIT.size()) {
+			// std::cout << "index: " << index << "\n";
+			BIT[index] += 1;
+			index += index & (-index);
+		}
+	}
+	// std::cout << "updateBIT end\n";
+
+}
+
+void initBIT(std::vector<unsigned long long int>& BIT)
+{
+	unsigned long long int currentNumber = 1;
+	unsigned long long int currentNumberStep = 2;
+
+	while(currentNumber < BIT.size()){ 
+		for(unsigned i = currentNumber; i < BIT.size(); ) {
+			BIT[i] = currentNumber;
+			i += currentNumberStep;
+		}
+		currentNumber *= 2;
+		currentNumberStep *= 2;
+	}
+
+	// std::cout << "BIT content\n";
+	// for(auto& i : BIT) {
+	// 	std::cout << i << " ";
+	// }
+	// std::cout << "\n";
+}
+
+unsigned long long countNumberOfGreaterElements(std::vector<unsigned long long int>& BIT, unsigned long long int pos)
+{
+	// std::cout << "\n\n\ncountNumberOfGreaterElements begin\n";
+
+	unsigned long long currentPos = pos;
+	unsigned long long numberOfGreaterElements = 0;
+
+	while(currentPos) {
+		// std::cout << "currentPos: " << currentPos << "\n";
+		// std::cout << "new currentPos: " << currentPos << "\n\n";
+
+		numberOfGreaterElements += BIT[currentPos];
+		currentPos -= currentPos & (-currentPos);
+		// currentPos = currentPos & (~(currentPos & (-currentPos)));
+	}
+
+	// std::cout << "countNumberOfGreaterElements end\n";
+
+
+	return numberOfGreaterElements;
+}
+
+template<typename T>
+unsigned long long int binary_search(const std::vector<T>& vec, unsigned long long int start, unsigned long long int end, const T& key)
+{
+    // Termination condition-: start index greater than end index
+
+    // std::cout << "start: " << start << "\n";
+    // std::cout << "end: " << end << "\n";
+    if(start > end)
+    {
+    	// std::cout << "error if(start > end)\n";
+        return -1;
+    }
+
+    // Find the middle element of the vector and use that for splitting
+    // the array unsigned long long into two pieces.
+    const unsigned long long int middle = start + ((end - start) / 2);
+
+    // std::cout << "vec[middle]: " << vec[middle] << "\n";
+    if(vec[middle] == key)
+    {
+        return middle;
+    }
+    else if(vec[middle] < key)
+    {
+        return binary_search(vec, start, middle - 1, key);
+    }
+
+    return binary_search(vec, middle + 1, end, key);
+}
+
+int main(int argc, char const *argv[]) {
 	// std::fstream file_out( "out.txt" , std::fstream::out);
 	std::fstream infile( "in.txt" , std::fstream::in);
 
-	std::vector<long long int> v;
+	std::vector<unsigned long long int> v;
 	int a;
 	while (infile >> a)
 	{
 		v.push_back(a);
 	}
 
-	std::vector<long long int> v2(v);
-	std::vector<long long int> v3(v);
+	std::vector<unsigned long long int> v2(v);
+	std::vector<unsigned long long int> v3(v);
+
+	std::vector<unsigned long long int> vBITSort(v);
+	std::vector<unsigned long long int> vBITUse(v);
 
 	MergeSort ms(std::move(v));
 	{
 		auto start = std::chrono::high_resolution_clock::now();
 		ms.sort();
 		auto finish = std::chrono::high_resolution_clock::now();
-		auto seconds = std::chrono::duration_cast<std::chrono::seconds>(finish-start);
-		// std::cout << "debug: using My Merge sort - the array was sorted in " << seconds.count() << "s\n";
+		auto seconds = std::chrono::duration_cast<std::chrono::milliseconds>(finish-start);
+		std::cout << "debug: using My Merge sort - the array was sorted in " << seconds.count() << "milliseconds\n";
 	}
 
-	const std::vector<long long int>& vMS = ms.getSortedArray();
+	const std::vector<unsigned long long int>& vMS = ms.getSortedArray();
 
 	{
 		auto start = std::chrono::high_resolution_clock::now();
@@ -277,28 +368,100 @@ private:
 	}
 
 
-	long long int curAns = 0;
+	// unsigned long long int curAns = 0;
 
-	auto start = std::chrono::high_resolution_clock::now();
-	brute_force(v3, curAns);
-	auto finish = std::chrono::high_resolution_clock::now();
+	// auto start = std::chrono::high_resolution_clock::now();
+	// brute_force(v3, curAns);
+	// auto finish = std::chrono::high_resolution_clock::now();
 
-	auto seconds = std::chrono::duration_cast<std::chrono::seconds>(finish-start);
-	std::cout << "It took the brute_force implementation " << seconds.count() << "s to find the number of invertions\n";
+	// auto seconds = std::chrono::duration_cast<std::chrono::seconds>(finish-start);
+	// std::cout << "It took the brute_force implementation " << seconds.count() << "s to find the number of invertions\n";
+	// // std::cout << "It took the brute_force implementation " << seconds.count() << "s to find the number of invertions\n";
 
-	std::cout << "number of invertions - " << curAns << "\n";
+	// std::cout << "number of invertions - " << curAns << "\n";
 
-	if(ms.getInversionCount() == curAns) {
+	unsigned long long int curAnsBIT = 0;
+	{
+		// auto& vSorted = vBITSort;
+		// std::sort(vSorted.begin(), vSorted.end(), std::greater<long long int>());
+		auto start = std::chrono::high_resolution_clock::now();
+		auto& vSorted = vBITSort;
+		std::sort(vSorted.begin(), vSorted.end(), std::greater<long long int>());
+		std::vector<unsigned long long int> BIT(vSorted.size() + 1);
+
+		for(auto rit = v.rbegin(); rit != v.rend(); rit++) {
+			auto elmPos = binary_search<unsigned long long int>(vSorted, 0, vSorted.size(), *rit);
+
+			unsigned long long int numberOfGreaterElementsPassed = countNumberOfGreaterElements(BIT, elmPos);
+			unsigned long long int numberOfGreaterElements = elmPos - numberOfGreaterElementsPassed;
+			curAnsBIT += numberOfGreaterElements;
+
+			updateBIT(BIT, elmPos + 1);
+		}
+		// std::vector<unsigned long long int> BIT(vSorted.size() + 1);
+		// // initBIT(BIT);
+
+
+		// unsigned long long int index = 0;
+		// for(auto rit = v.rbegin(); rit != v.rend(); rit++) {
+		// 	// std::cout << index++ << "\n";
+
+		// 	// std::cout << "*rit: " << *rit << "\n";
+		// 	auto startFind = std::chrono::high_resolution_clock::now();
+		// 	// auto elIt = std::find(vSorted.begin(), vSorted.end(), *rit);
+		// 	auto elmPos = binary_search<unsigned long long int>(vSorted, 0, vSorted.size(), *rit);
+		// 	auto finishFind = std::chrono::high_resolution_clock::now();
+		// 	// std::cout << "elmPos: " << elmPos << "\n";
+
+		// 	auto secondsFind = std::chrono::duration_cast<std::chrono::nanoseconds>(finishFind-startFind);
+		// 	// std::cout << secondsFind.count() << "s to find the number\n";
+
+		// 	// std::cout << "*rit: " << *rit << "\n";
+
+		// 	auto startAdd = std::chrono::high_resolution_clock::now();
+		// 	// unsigned long long int pos = std::distance(vSorted.begin(), elIt);
+		// 	unsigned long long int numberOfGreaterElementsPassed = countNumberOfGreaterElements(BIT, elmPos);
+		// 	// std::cout << "numberOfGreaterElementsPassed: " << numberOfGreaterElementsPassed << "\n";
+		// 	unsigned long long int numberOfGreaterElements = elmPos - numberOfGreaterElementsPassed;
+		// 	curAnsBIT += numberOfGreaterElements;
+		// 	// std::cout << "numberOfGreaterElements: " << numberOfGreaterElements << "\n";
+
+		// 	auto finishAdd = std::chrono::high_resolution_clock::now();
+
+		// 	auto secondsAdd = std::chrono::duration_cast<std::chrono::nanoseconds>(finishAdd-startAdd);
+		// 	// std::cout << secondsAdd.count() << "s to add the number\n";
+
+
+
+		// 	auto startUpdate = std::chrono::high_resolution_clock::now();
+
+		// 	updateBIT(BIT, elmPos + 1);
+		// 	auto finishUpdate = std::chrono::high_resolution_clock::now();
+
+		// 	auto secondsUpdate = std::chrono::duration_cast<std::chrono::nanoseconds>(finishUpdate-startUpdate);
+		// 	// std::cout << secondsUpdate.count() << "s to update the array\n\n\n";
+
+		// }
+		auto finish = std::chrono::high_resolution_clock::now();
+
+		auto seconds = std::chrono::duration_cast<std::chrono::milliseconds>(finish-start);
+		std::cout << "It took the BIT implementation " << seconds.count() << "milliseconds to find the number of invertions\n";
+	}
+
+
+	if(ms.getInversionCount() == curAnsBIT) {
 		std::cout << "\n\nThe number of invertions match!\n";
 	} else {
+		std::cout << "curAnsBIT: " << curAnsBIT << "\n";
+		std::cout << "ms.getInversionCount(): " << ms.getInversionCount() << "\n";
 		std::cout << "\n\nERROR!!!\n\nThe number of invertions DO NOT match!\n";
 	}
 
 	return 0;
-}*/
+}
 
 
-int main(int argc, char const *argv[]) {
+/*int main(int argc, char const *argv[]) {
 	// std::fstream file_out( "out.txt" , std::fstream::out);
 	// std::fstream file( "in.txt" , std::fstream::in);
 
@@ -316,7 +479,7 @@ int main(int argc, char const *argv[]) {
 	int inputIndex = 0;
 	std::string inputNumStr;
 
-	std::vector<long long int> TC;
+	std::vector<unsigned long long int> TC;
 	InputState is = GET_ARRAY_SIZE;
 	int currentArraySize = 0;
 	int currentArrayIndex = 0;
@@ -380,3 +543,4 @@ int main(int argc, char const *argv[]) {
 
 	return 0;
 }
+*/
