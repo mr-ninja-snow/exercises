@@ -9,8 +9,18 @@
 #include <vector>
 
 
-void updateBIT(std::vector<unsigned long long int>& BIT)
+void updateBIT(std::vector<unsigned long long int>& BIT, unsigned long long int index)
 {
+	// std::cout << "updateBIT begin\n";
+	if( index != 0) {
+		
+		while(index <= BIT.size()) {
+			// std::cout << "index: " << index << "\n";
+			BIT[index] -= 1;
+			index += index & (-index);
+		}
+	}
+	// std::cout << "updateBIT end\n";
 
 }
 
@@ -20,7 +30,7 @@ void initBIT(std::vector<unsigned long long int>& BIT)
 	unsigned long long int currentNumberStep = 2;
 
 	while(currentNumber < BIT.size()){ 
-		for(unsigned i = currentNumber - 1; i < BIT.size(); ) {
+		for(unsigned i = currentNumber; i < BIT.size(); ) {
 			BIT[i] = currentNumber;
 			i += currentNumberStep;
 		}
@@ -37,20 +47,24 @@ void initBIT(std::vector<unsigned long long int>& BIT)
 
 unsigned long long countNumberOfGreaterElements(std::vector<unsigned long long int>& BIT, unsigned long long int pos)
 {
-	std::cout << "\n\n\n";
+	// std::cout << "\n\n\ncountNumberOfGreaterElements begin\n";
 
 	unsigned long long currentPos = pos;
 	unsigned long long numberOfGreaterElements = 0;
 
 	while(currentPos) {
 		std::cout << "currentPos: " << currentPos << "\n";
-		currentPos = currentPos & (~(currentPos & (-currentPos)));
-		std::cout << "new currentPos: " << currentPos << "\n\n";
+		// std::cout << "new currentPos: " << currentPos << "\n\n";
 
 		numberOfGreaterElements += BIT[currentPos];
+		currentPos -= currentPos & (-currentPos);
+		// currentPos = currentPos & (~(currentPos & (-currentPos)));
 	}
 
-	return 0;
+	// std::cout << "countNumberOfGreaterElements end\n";
+
+
+	return numberOfGreaterElements;
 }
 
 int main(int argc, char const *argv[]) {
@@ -68,8 +82,26 @@ int main(int argc, char const *argv[]) {
 
 	std::sort(vSorted.begin(), vSorted.end(), std::greater<long long int>());
 
-	std::vector<unsigned long long int> BIT(vSorted.size());
+	std::vector<unsigned long long int> BIT(vSorted.size() + 1);
 	initBIT(BIT);
+
+	unsigned long long int numberOfInvertions = 0;
+	for(auto rit = v.rbegin(); rit != v.rend(); rit++) {
+		auto elIt = std::find(vSorted.begin(), vSorted.end(), *rit);
+
+		std::cout << "*rit: " << *rit << "\n";
+
+		unsigned long long int pos = std::distance(vSorted.begin(), elIt);
+		std::cout << "pos: " << pos << "\n";
+		unsigned long long int numberOfGreaterElements = countNumberOfGreaterElements(BIT, pos);
+		numberOfInvertions += numberOfGreaterElements;
+		std::cout << "numberOfGreaterElements: " << numberOfGreaterElements << "\n";
+
+		updateBIT(BIT, pos + 1);
+	}
+
+	std::cout << "numberOfInvertions: " << numberOfInvertions << "\n";
+
 
 
 	// for(auto&& i : BIT) {

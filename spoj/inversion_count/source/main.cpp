@@ -243,27 +243,6 @@ void updateBIT(std::vector<unsigned long long int>& BIT, unsigned long long int 
 
 }
 
-void initBIT(std::vector<unsigned long long int>& BIT)
-{
-	unsigned long long int currentNumber = 1;
-	unsigned long long int currentNumberStep = 2;
-
-	while(currentNumber < BIT.size()){ 
-		for(unsigned i = currentNumber; i < BIT.size(); ) {
-			BIT[i] = currentNumber;
-			i += currentNumberStep;
-		}
-		currentNumber *= 2;
-		currentNumberStep *= 2;
-	}
-
-	// std::cout << "BIT content\n";
-	// for(auto& i : BIT) {
-	// 	std::cout << i << " ";
-	// }
-	// std::cout << "\n";
-}
-
 unsigned long long countNumberOfGreaterElements(std::vector<unsigned long long int>& BIT, unsigned long long int pos)
 {
 	// std::cout << "\n\n\ncountNumberOfGreaterElements begin\n";
@@ -315,7 +294,7 @@ unsigned long long int binary_search(const std::vector<T>& vec, unsigned long lo
 
     return binary_search(vec, middle + 1, end, key);
 }
-
+/*
 int main(int argc, char const *argv[]) {
 	// std::fstream file_out( "out.txt" , std::fstream::out);
 	std::fstream infile( "in.txt" , std::fstream::in);
@@ -458,10 +437,10 @@ int main(int argc, char const *argv[]) {
 	}
 
 	return 0;
-}
+}*/
 
 
-/*int main(int argc, char const *argv[]) {
+int main(int argc, char const *argv[]) {
 	// std::fstream file_out( "out.txt" , std::fstream::out);
 	// std::fstream file( "in.txt" , std::fstream::in);
 
@@ -476,6 +455,14 @@ int main(int argc, char const *argv[]) {
 	std::ostream& output = std::cout;
 	// std::ostream& output = file_out;
 
+	enum AlgoToUse
+	{
+		MergeSortAlgo,
+		BITAlgo
+	};
+
+	AlgoToUse algo = BITAlgo;
+
 	int inputIndex = 0;
 	std::string inputNumStr;
 
@@ -489,7 +476,6 @@ int main(int argc, char const *argv[]) {
 	int numberOfTestCases = 0;
 	while (input >> inputNumStr)
 	{
-		// std::cout << "input: '" << inputNumStr<< "'\n";
 		if(inputIndex == 0) {
 			numberOfTestCases = std::stoi(inputNumStr);
 			inputIndex++;
@@ -500,22 +486,18 @@ int main(int argc, char const *argv[]) {
 		{
 		case GET_ARRAY_SIZE:
 			currentArraySize = std::stoi(inputNumStr);
-			//testcases.emplace_back(currentArraySize);
+
 			TC.clear();
 			currentArrayIndex = 0;
 			is = GET_ARRAY_ELEMENT;
-			// std::cout << "\nsize of tc array  " << testcases.size() << "\n";
-			// arrayPosMap.clear();
+
 			break;
 		case GET_ARRAY_ELEMENT:
-			// testcases[testcasesIndex][currentArrayIndex] = std::stoi(inputNumStr);
 			curNum = std::stoi(inputNumStr);
 			TC.push_back(curNum);
-			// arrayPosMap.insert(std::pair<int, int>(curNum, currentArrayIndex));
-			// std::cout << "\nsize of tc  " << testcases[testcasesIndex].size() << "\n";
+
 			currentArrayIndex++;
 			if(currentArrayIndex == currentArraySize) {
-				// testcasesIndex++;
 				is = FIND_ANS;
 			}
 			else
@@ -524,12 +506,39 @@ int main(int argc, char const *argv[]) {
 			}
 		case FIND_ANS:
 		{
-			MergeSort ms(std::move(TC));
-			auto start = std::chrono::high_resolution_clock::now();
-			ms.sort();
+			switch(algo)
+			{
+			case BITAlgo:
+				{
+					unsigned long long int curAnsBIT = 0;
+					std::vector<unsigned long long int> v(TC);
+					auto& vSorted = TC;
+					std::sort(vSorted.begin(), vSorted.end(), std::greater<unsigned long long int>());
+					std::vector<unsigned long long int> BIT(vSorted.size() + 1);
+
+					for(auto rit = v.rbegin(); rit != v.rend(); rit++) {
+						auto elmPos = binary_search<unsigned long long int>(vSorted, 0, vSorted.size(), *rit);
+
+						unsigned long long int numberOfGreaterElementsPassed = countNumberOfGreaterElements(BIT, elmPos);
+						unsigned long long int numberOfGreaterElements = elmPos - numberOfGreaterElementsPassed;
+						curAnsBIT += numberOfGreaterElements;
+
+						updateBIT(BIT, elmPos + 1);
+					}
+					std::cout << curAnsBIT << "\n";
+					break;
+				}
+			case MergeSortAlgo:
+				{
+					MergeSort ms(std::move(TC));
+					auto start = std::chrono::high_resolution_clock::now();
+					ms.sort();
+					std::cout << ms.getInversionCount() << "\n";
+					break;
+				}
+			}
 
 			is = GET_ARRAY_SIZE;
-			std::cout << ms.getInversionCount() << "\n";
 
 			numberOfTestCases--;
 			if(numberOfTestCases == 0) {
@@ -543,4 +552,3 @@ int main(int argc, char const *argv[]) {
 
 	return 0;
 }
-*/
